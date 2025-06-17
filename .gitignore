@@ -1,0 +1,7 @@
+# Claude
+.claude
+
+# C
+bin
+.cache
+compile_commands.json
