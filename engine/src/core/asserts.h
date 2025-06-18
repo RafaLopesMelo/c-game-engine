@@ -9,12 +9,6 @@
 
 #if _MSC_VER
 #include <intrin.h>
-#define debugBreak() __debugbreak()
-#else
-#define debugBreak() __builtin_trap()
-#endif
-#if _MSC_VER
-#include <intrin.h>
 #define debugBreak() __debugbreak();
 #else
 #define debugBreak() __builtin_trap();

@@ -1,6 +1,6 @@
 #include "logger.h"
 #include "assert.h"
-#include "core/asserts.h"
+#include "platform/platform.h"
 
 // TODO: temporary
 #include <stdarg.h>
@@ -40,8 +40,11 @@ void log_output(log_level level, const char *message, ...) {
     char out_message2[32000];
     sprintf(out_message2, "%s%s\n", level_strings[level], out_message);
 
-    // TODO: platform-specific output.
-    printf("%s", out_message2);
+    if (is_error) {
+        platform_console_write_error(out_message2, level);
+    } else {
+        platform_console_write(out_message2, level);
+    }
 };
 
 KAPI void report_assertion_failure(const char *expr, const char *msg,
