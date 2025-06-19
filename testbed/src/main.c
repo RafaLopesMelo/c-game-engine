@@ -1,23 +1,18 @@
+#include "core/application.h"
 #include <core/asserts.h>
 #include <core/logger.h>
-
-#include <platform/platform.h>
+#include <stdlib.h>
 
 int main(void) {
-    KFATAL("A test message: %f", 3.14f);
-    KERROR("A test message: %f", 3.14f);
-    KWARN("A test message: %f", 3.14f);
-    KINFO("A test message: %f", 3.14f);
-    KDEBUG("A test message: %f", 3.14f);
-    KTRACE("A test message: %f", 3.14f);
+    application_config config;
+    config.name = "RMelo Game Engine";
+    config.start_height = 480;
+    config.start_width = 480;
+    config.start_pos_y = 180;
+    config.start_pos_x = 180;
 
-    platform_state state;
-    if (platform_startup(&state, "RMelo Engine Testbed", 100, 100, 1280, 720)) {
-        while (TRUE) {
-            platform_pump_messages(&state);
-        }
-    }
-    platform_shutdown(&state);
+    application_create(&config);
+    application_run();
 
     return 0;
 }
