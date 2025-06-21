@@ -1,6 +1,7 @@
 #include "event.h"
 #include "containers/darray.h"
 #include "core/kmemory.h"
+#include "core/logger.h"
 
 typedef struct registered_event {
     void *listener;
@@ -28,6 +29,8 @@ b8 event_initialize() {
     is_initialized = FALSE;
     kzero_memory(&state, sizeof(state));
     is_initialized = TRUE;
+
+    KINFO("Event subsystem initialzed!");
 
     return TRUE;
 }

@@ -1,5 +1,6 @@
 #include "kmemory.h"
 
+#include "core/kstring.h"
 #include "core/logger.h"
 #include "platform/platform.h"
 #include <stdio.h>
@@ -94,6 +95,6 @@ char *get_memory_usage_str() {
         offset += length;
     }
 
-    char *out_string = strdup(buffer);
+    char *out_string = string_duplicate(buffer);
     return out_string;
 }
