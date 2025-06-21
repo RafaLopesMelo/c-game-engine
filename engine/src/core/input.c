@@ -26,7 +26,7 @@ static input_state state = {};
 void input_initialize() {
     kzero_memory(&state, sizeof(input_state));
     initialized = TRUE;
-    KINFO("Input subsystem initialzed!");
+    KINFO("Input subsystem initialized successfully!");
 }
 
 void input_shutdown() { initialized = FALSE; }

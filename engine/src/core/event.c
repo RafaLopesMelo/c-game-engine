@@ -30,7 +30,7 @@ b8 event_initialize() {
     kzero_memory(&state, sizeof(state));
     is_initialized = TRUE;
 
-    KINFO("Event subsystem initialzed!");
+    KINFO("Event subsystem initialized successfully!");
 
     return TRUE;
 }
