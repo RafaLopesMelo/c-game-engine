@@ -1,3 +1,6 @@
+#include "containers/darray.h"
+#include "renderer/vulkan/vulkan_platform.h"
+
 #include "core/input.h"
 #include "defines.h"
 #include "platform.h"
@@ -247,6 +250,10 @@ void platform_sleep(u64 ms) {
     }
     usleep((ms % 1000) * 1000);
 #endif
+}
+
+void platform_get_required_extension_names(const char ***names_darray) {
+    darray_push(*names_darray, &"VK_KHR_xcb_surface");
 }
 
 keys translate_keycode(u32 x_keycode) {

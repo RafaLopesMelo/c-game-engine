@@ -24,7 +24,7 @@ KAPI void *_darray_insert_at(void *array, u64 index, void *value_ptr);
 #define darray_create(type)                                                    \
     _darray_create(DARRAY_DEFAULT_CAPACITY, sizeof(type))
 
-#define darray_reserve(array, capacity) _darray_reserve(capacity, sizeof(type))
+#define darray_reserve(type, capacity) _darray_create(capacity, sizeof(type))
 
 #define darray_destroy(array) _darray_destroy(array)
 

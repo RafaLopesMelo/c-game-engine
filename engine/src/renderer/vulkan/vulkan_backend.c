@@ -1,7 +1,13 @@
 #include "renderer/vulkan/vulkan_backend.h"
-#include "core/logger.h"
 #include "renderer/renderer_types.inl"
 
+#include "containers/darray.h"
+#include "core/kstring.h"
+#include "core/logger.h"
+
+#include "platform/platform.h"
+
+#include "renderer/vulkan/vulkan_platform.h"
 #include "vulkan/vulkan_core.h"
 #include "vulkan_types.inl"
 
@@ -21,18 +27,73 @@ b8 vulkan_renderer_backend_initialize(renderer_backend *backend,
 
     VkInstanceCreateInfo create_info = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
     create_info.pApplicationInfo = &app_info;
-    create_info.enabledExtensionCount = 0;
-    create_info.ppEnabledExtensionNames = 0;
-    create_info.enabledLayerCount = 0;
-    create_info.ppEnabledLayerNames = 0;
 
-    VkResult result =
-        vkCreateInstance(&create_info, context.allocator, &context.instance);
+    const char **required_extensions = darray_create(const char *);
 
-    if (result != VK_SUCCESS) {
-        KERROR("vkCreateInstance failed with result: %u", result);
-        return FALSE;
+    // Generic surface extension
+    darray_push(required_extensions, &VK_KHR_SURFACE_EXTENSION_NAME);
+
+    platform_get_required_extension_names(&required_extensions);
+
+#if defined(_DEBUG)
+    darray_push(required_extensions, &VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+    KDEBUG("Required extensions:");
+    u32 length = darray_length(required_extensions);
+    for (u32 i = 0; i < length; i++) {
+        KDEBUG(required_extensions[i]);
     }
+#endif
+
+    create_info.enabledExtensionCount = darray_length(required_extensions);
+    create_info.ppEnabledExtensionNames = required_extensions;
+
+    const char **required_validation_layer_names = 0;
+    u32 required_validation_layers_count = 0;
+
+#if defined(_DEBUG)
+    KINFO("Validation layers enabled. Enumerating...");
+
+    required_validation_layer_names = darray_create(const char *);
+    darray_push(required_validation_layer_names,
+                &"VK_LAYER_KHRONOS_validation");
+    required_validation_layers_count =
+        darray_length(required_validation_layer_names);
+
+    u32 available_layer_count = 0;
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&available_layer_count, 0));
+    VkLayerProperties *available_layers =
+        darray_reserve(VkLayerProperties, available_layer_count);
+    VK_CHECK(vkEnumerateInstanceLayerProperties(&available_layer_count,
+                                                available_layers));
+
+    for (u32 i = 0; i < required_validation_layers_count; ++i) {
+        KINFO("Searching for layer: %s...", required_validation_layer_names[i]);
+        b8 found = FALSE;
+        for (u32 j = 0; j < available_layer_count; ++j) {
+            if (strings_equal(required_validation_layer_names[i],
+                              available_layers[j].layerName)) {
+                found = TRUE;
+                KINFO("Found.");
+                break;
+            }
+        }
+
+        if (!found) {
+            KFATAL("Required validation layer is missing: %s",
+                   required_validation_layer_names[i]);
+            return FALSE;
+        }
+    }
+
+    KINFO("All required validation layers are present.");
+#endif
+
+    create_info.enabledLayerCount = required_validation_layers_count;
+    create_info.ppEnabledLayerNames = required_validation_layer_names;
+
+    VK_CHECK(
+        vkCreateInstance(&create_info, context.allocator, &context.instance));
 
     KINFO("Vulkan renderer initialized successfully!");
     return TRUE;
