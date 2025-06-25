@@ -41,6 +41,7 @@ b8 vulkan_device_create(vulkan_context *context) {
 
     KINFO("Creating logical device...");
 
+    // May be a problem for future. But for now 10 max is enough is enough
     u8 queues_per_family[10] = {0};
     queues_per_family[context->device.graphics_queue_index] += 1;
     queues_per_family[context->device.transfer_queue_index] += 1;
