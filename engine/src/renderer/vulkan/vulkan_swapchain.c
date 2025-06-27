@@ -70,6 +70,9 @@ b8 vulkan_swapchain_present(vulkan_context *context,
         return FALSE;
     }
 
+    context->current_frame =
+        (context->current_frame + 1) & swapchain->max_frames_in_flight;
+
     return TRUE;
 }
 
