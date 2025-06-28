@@ -1,4 +1,5 @@
 #include "containers/darray.h"
+#include "core/event.h"
 #include "renderer/vulkan/vulkan_platform.h"
 
 #include "core/input.h"
@@ -48,7 +49,6 @@ keys translate_keycode(u32 x_keycode);
 
 b8 platform_startup(platform_state *plat_state, const char *application_name,
                     i32 x, i32 y, i32 width, i32 height) {
-
     plat_state->internal_state = malloc(sizeof(internal_state));
     internal_state *state = (internal_state *)plat_state->internal_state;
 
@@ -191,7 +191,13 @@ b8 platform_pump_messages(platform_state *plat_state) {
             input_process_mouse_move(move_event->event_x, move_event->event_y);
         } break;
         case XCB_CONFIGURE_NOTIFY: {
-            // resizing
+            xcb_configure_notify_event_t *configure_event =
+                (xcb_configure_notify_event_t *)event;
+
+            event_context context;
+            context.data.u16[0] = configure_event->width;
+            context.data.u16[1] = configure_event->height;
+            event_fire(EVENT_CODE_RESIZED, 0, context);
         } break;
         case XCB_CLIENT_MESSAGE: {
             cm = (xcb_client_message_event_t *)event;
